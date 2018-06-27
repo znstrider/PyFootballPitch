@@ -20,8 +20,13 @@ create a figure and an axis object before invoking
     -----
     Draws a horizontal pitch on an axes object with width 105m and height 68m
     -----
-    If you are using StatsBomb Data with a 120x80yard pitch (or any other pitchsize), use:
-    hspan = [0, 120], vspan = [0, 80]
+    If you are using StatsBomb Data with a 120x80yard pitch, use:
+    measure == 'SBData'
+    -----
+    If you are using any other pitch size, set measure to yards or metres
+    for correct pitch markings and
+    hspan = [left, right]
+    vspan = [bottom, top]
     to adjust the plot to your needs.
     -----
     Choose a Style with
@@ -34,7 +39,8 @@ create a figure and an axis object before invoking
     or also to just draw half the pitch
     -----
     grass_cutting = n to divide the pitch into n-1 vertical stripes from box to box
-    (works best for eneven n)
+    (works best for even n)
+    grass_cutting = True sets n to 14
     '''
 
 
