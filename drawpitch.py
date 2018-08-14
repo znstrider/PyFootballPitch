@@ -3,22 +3,26 @@ from matplotlib import patches
 from math import pi
 import numpy as np
 
-def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34], measure = 'metres',\
+def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34],\
+                orientation = 'horizontal', measure = 'metres',\
                 linecolor = '#525252', facecolor = '#f0f0f0', arcs = True, \
                 lw = 1.5, x_offset = [4,4], y_offset = [4,4], style_id = None,
+                aspect = 'equal',
                 grass_cutting = False):
     '''
     -----
-    Draws a horizontal pitch on an axes object with width 105m and height 68m
+    Draws a pitch (default horizontal) on an axes object with width 105m and height 68m
     -----
     If you are using StatsBomb Data with a 120x80yard pitch, use:
-    measure == 'SBData'
+    measure = 'SBData'
     -----
     If you are using any other pitch size, set measure to yards or metres
     for correct pitch markings and
     hspan = [left, right] // eg. for SBData this is: hspan = [0, 120]
     vspan = [bottom, top] //
     to adjust the plot to your needs.
+    -----
+    orientation: 'horizontal' or 'vertical'
     -----
     Choose a Style with
     style_id = 1...8
@@ -64,59 +68,124 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34], measure = 'metres',\
             raise ValueError('style_id needs to be in range(1, '+str(len(style)+1)+')')
     ax.set_facecolor(facecolor)
 
-    mid_circle = plt.Circle((hmid, vmid), radius=measures[2], fc='None', color = linecolor, lw = lw )
-    ax.add_patch(mid_circle)
 
-    mid_point = plt.Circle((hmid, vmid), radius=0.4, fc='white', color = linecolor, lw = lw)
-    ax.add_patch(mid_point)
+    if orientation == 'horizontal':
+        mid_circle = plt.Circle((hmid, vmid), radius=measures[2], fc='None', color = linecolor, lw = lw )
+        ax.add_patch(mid_circle)
 
-    fiveyard1 = plt.Rectangle((hspan[0], vmid-measures[2]), measures[1], measures[2]*2, fc='None', color = linecolor, lw = lw)
-    ax.add_patch(fiveyard1)
+        mid_point = plt.Circle((hmid, vmid), radius=0.4, fc='white', color = linecolor, lw = lw)
+        ax.add_patch(mid_point)
 
-    fiveyard2 = plt.Rectangle((hspan[1]-measures[1], vmid-measures[2]), measures[1], measures[2]*2, fc='None', color = linecolor, lw = lw)
-    ax.add_patch(fiveyard2)
+        fiveyard1 = plt.Rectangle((hspan[0], vmid-measures[2]), measures[1], measures[2]*2, fc='None', color = linecolor, lw = lw)
+        ax.add_patch(fiveyard1)
 
-    box1 = plt.Rectangle((hspan[0], vmid-measures[4]/2), measures[3], measures[4], fc='None', color = linecolor, lw = lw)
-    ax.add_patch(box1)
+        fiveyard2 = plt.Rectangle((hspan[1]-measures[1], vmid-measures[2]), measures[1], measures[2]*2, fc='None', color = linecolor, lw = lw)
+        ax.add_patch(fiveyard2)
 
-    box2 = plt.Rectangle((hspan[1]-measures[3], vmid-measures[4]/2), measures[3], measures[4], fc='None', color = linecolor, lw = lw)
-    ax.add_patch(box2)
+        box1 = plt.Rectangle((hspan[0], vmid-measures[4]/2), measures[3], measures[4], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(box1)
 
-    midline = plt.Line2D((hmid, hmid), (vspan[0], vspan[1]), c = linecolor, lw = lw)
-    ax.add_line(midline)
+        box2 = plt.Rectangle((hspan[1]-measures[3], vmid-measures[4]/2), measures[3], measures[4], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(box2)
 
-    leftgoalline = plt.Line2D((hspan[0],hspan[0]),(vspan[1], vspan[0]), c = linecolor, lw = lw)
-    ax.add_line(leftgoalline)
+        midline = plt.Line2D((hmid, hmid), (vspan[0], vspan[1]), c = linecolor, lw = lw)
+        ax.add_line(midline)
 
-    rightgoalline = plt.Line2D((hspan[1],hspan[1]),(vspan[1], vspan[0]), c = linecolor, lw = lw)
-    ax.add_line(rightgoalline)
+        leftgoalline = plt.Line2D((hspan[0],hspan[0]),(vspan[1], vspan[0]), c = linecolor, lw = lw)
+        ax.add_line(leftgoalline)
 
-    topfieldline = plt.Line2D((hspan[0],hspan[1]),(vspan[1], vspan[1]), c = linecolor, lw = lw)
-    ax.add_line(topfieldline)
+        rightgoalline = plt.Line2D((hspan[1],hspan[1]),(vspan[1], vspan[0]), c = linecolor, lw = lw)
+        ax.add_line(rightgoalline)
 
-    bottomfieldline = plt.Line2D((hspan[0],hspan[1]),(vspan[0],vspan[0]), c = linecolor, lw = lw)
-    ax.add_line(bottomfieldline)
+        topfieldline = plt.Line2D((hspan[0],hspan[1]),(vspan[1], vspan[1]), c = linecolor, lw = lw)
+        ax.add_line(topfieldline)
 
-    goal1 = plt.Line2D((hspan[0],hspan[0]),(vmid+measures[0],vmid-measures[0]), c=linecolor, lw = 3*lw)
-    ax.add_line(goal1)
+        bottomfieldline = plt.Line2D((hspan[0],hspan[1]),(vspan[0],vspan[0]), c = linecolor, lw = lw)
+        ax.add_line(bottomfieldline)
 
-    goal2 = plt.Line2D((hspan[1],hspan[1]),(vmid+measures[0],vmid-measures[0]), c = linecolor, lw = 3*lw)
-    ax.add_line(goal2)
+        goal1 = plt.Line2D((hspan[0],hspan[0]),(vmid+measures[0],vmid-measures[0]), c=linecolor, lw = 3*lw, solid_capstyle = 'butt')
+        ax.add_line(goal1)
 
-    penalty1 = plt.Circle((hspan[0]+2*measures[1], vmid), radius = 0.4, fc = linecolor, color=linecolor)
-    ax.add_patch(penalty1)
+        goal2 = plt.Line2D((hspan[1],hspan[1]),(vmid+measures[0],vmid-measures[0]), c = linecolor, lw = 3*lw, solid_capstyle = 'butt')
+        ax.add_line(goal2)
 
-    penalty2 = plt.Circle((hspan[1]-2*measures[1], vmid), radius = 0.4, fc = linecolor, color=linecolor)
-    ax.add_patch(penalty2)
+        penalty1 = plt.Circle((hspan[0]+2*measures[1], vmid), radius = 0.4, fc = linecolor, color=linecolor)
+        ax.add_patch(penalty1)
 
-    if arcs:
-        a = np.arccos((measures[3]-11)/measures[2])
-        arc1 = patches.Arc(xy = (hspan[0]+11, vmid), width = 2*measures[2], height = 2*measures[2],\
-                                theta1 = (2*pi - a)*180/pi, theta2 = a*180/pi, color = linecolor, lw = lw)
-        ax.add_patch(arc1)
-        arc2 = patches.Arc(xy = (hspan[1]-11, vmid), width = 2*measures[2], height = 2*measures[2],\
-                                theta1 = (pi - a)*180/pi, theta2 = (pi + a)*180/pi, color = linecolor, lw = lw)
-        ax.add_patch(arc2)
+        penalty2 = plt.Circle((hspan[1]-2*measures[1], vmid), radius = 0.4, fc = linecolor, color=linecolor)
+        ax.add_patch(penalty2)
+
+        if arcs:
+            a = np.arccos((measures[3]-11)/measures[2])
+            arc1 = patches.Arc(xy = (hspan[0]+11, vmid), width = 2*measures[2], height = 2*measures[2],\
+                                    theta1 = (2*pi - a)*180/pi, theta2 = a*180/pi, color = linecolor, lw = lw)
+            ax.add_patch(arc1)
+            arc2 = patches.Arc(xy = (hspan[1]-11, vmid), width = 2*measures[2], height = 2*measures[2],\
+                                    theta1 = (pi - a)*180/pi, theta2 = (pi + a)*180/pi, color = linecolor, lw = lw)
+            ax.add_patch(arc2)
+
+
+
+    if orientation == 'vertical':
+        ax.axis([vspan[0]-y_offset[0],vspan[1]+y_offset[1], hspan[0]-x_offset[0],hspan[1]+x_offset[1]])
+
+        mid_circle = plt.Circle((vmid, hmid), radius=measures[2], fc='None', color = linecolor, lw = lw )
+        ax.add_patch(mid_circle)
+
+        mid_point = plt.Circle((vmid, hmid), radius=0.4, fc='white', color = linecolor, lw = lw)
+        ax.add_patch(mid_point)
+
+        fiveyard1 = plt.Rectangle((vmid-measures[2], hspan[0]), measures[2]*2, measures[1], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(fiveyard1)
+
+        fiveyard2 = plt.Rectangle((vmid-measures[2], hspan[1]-measures[1]), measures[2]*2, measures[1], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(fiveyard2)
+
+        box1 = plt.Rectangle((vmid-measures[4]/2, hspan[0]), measures[4], measures[3], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(box1)
+
+        box2 = plt.Rectangle((vmid-measures[4]/2, hspan[1]-measures[3]), measures[4], measures[3], fc='None', color = linecolor, lw = lw)
+        ax.add_patch(box2)
+
+        midline = plt.Line2D((vspan[1], vspan[0]), (hmid, hmid), c = linecolor, lw = lw)
+        ax.add_line(midline)
+
+        leftgoalline = plt.Line2D((vspan[1], vspan[0]), (hspan[0],hspan[0]), c = linecolor, lw = lw)
+        ax.add_line(leftgoalline)
+
+        rightgoalline = plt.Line2D((vspan[1], vspan[0]), (hspan[1],hspan[1]), c = linecolor, lw = lw)
+        ax.add_line(rightgoalline)
+
+        topfieldline = plt.Line2D((vspan[1], vspan[1]), (hspan[0],hspan[1]), c = linecolor, lw = lw)
+        ax.add_line(topfieldline)
+
+        bottomfieldline = plt.Line2D((vspan[0],vspan[0]), (hspan[0],hspan[1]), c = linecolor, lw = lw)
+        ax.add_line(bottomfieldline)
+
+        goal1 = plt.Line2D((vmid+measures[0],vmid-measures[0]), (hspan[0],hspan[0]), c=linecolor, lw = 3*lw, solid_capstyle = 'butt')
+        ax.add_line(goal1)
+
+        goal2 = plt.Line2D((vmid+measures[0],vmid-measures[0]), (hspan[1],hspan[1]), c = linecolor, lw = 3*lw, solid_capstyle = 'butt')
+        ax.add_line(goal2)
+
+        penalty1 = plt.Circle((vmid, hspan[0]+2*measures[1]), radius = 0.4, fc = linecolor, color=linecolor)
+        ax.add_patch(penalty1)
+
+        penalty2 = plt.Circle((vmid, hspan[1]-2*measures[1]), radius = 0.4, fc = linecolor, color=linecolor)
+        ax.add_patch(penalty2)
+
+        if arcs:
+            a = np.arccos((measures[3]-11)/measures[2])
+            arc1 = patches.Arc(xy = (vmid, hspan[0]+11), width = 2*measures[2], height = 2*measures[2],\
+                                    theta1 = (0.5*pi - a)*180/pi, theta2 = (0.5*pi + a)*180/pi, color = linecolor, lw = lw)
+            #                        theta1 = (2*pi - a)*180/pi, theta2 = a*180/pi, color = linecolor, lw = lw)
+            ax.add_patch(arc1)
+            arc2 = patches.Arc(xy = (vmid, hspan[1]-11), width = 2*measures[2], height = 2*measures[2],\
+                                    theta1 = (1.5*pi - a)*180/pi, theta2 = (1.5*pi + a)*180/pi, color = linecolor, lw = lw)
+            #                        theta1 = (pi - a)*180/pi, theta2 = (pi + a)*180/pi, color = linecolor, lw = lw)
+            ax.add_patch(arc2)
+
+
 
     if grass_cutting:
         if grass_cutting == True:
@@ -143,12 +212,15 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34], measure = 'metres',\
         ax.add_patch(rect)
 
     ax.tick_params(
-        axis='both',          # changes apply to the x-axis
-        which='both',      # both major and minor ticks are affected
-        bottom='off',      # ticks along the bottom edge are off
-        top='off',         # ticks along the top edge are off
-        left='off',
-        labelleft='off',
-        labelbottom='off')
+        axis= 'both',          # changes apply to the x-axis
+        which= 'both',      # both major and minor ticks are affected
+        bottom= False,      # ticks along the bottom edge are off
+        top= False,         # ticks along the top edge are off
+        left= False,
+        labelleft= False,
+        labelbottom= False)
+
+    if aspect == 'equal':
+        ax.set_aspect('equal', 'box')
 
     return ax
