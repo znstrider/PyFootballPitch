@@ -17,17 +17,20 @@ create a figure and an axis object before invoking
                 lw = 1.5, x_offset = [4,4], y_offset = [4,4], style_id = None,
                 grass_cutting = False):
     '''
+    '''
     -----
-    Draws a horizontal pitch on an axes object with width 105m and height 68m
+    Draws a pitch (default horizontal) on an axes object with width 105m and height 68m
     -----
     If you are using StatsBomb Data with a 120x80yard pitch, use:
-    measure == 'SBData'
+    measure = 'SBData'
     -----
     If you are using any other pitch size, set measure to yards or metres
     for correct pitch markings and
-    hspan = [left, right]
-    vspan = [bottom, top]
+    hspan = [left, right] // eg. for SBData this is: hspan = [0, 120]
+    vspan = [bottom, top] //
     to adjust the plot to your needs.
+    -----
+    orientation: 'horizontal' or 'vertical'
     -----
     Choose a Style with
     style_id = 1...8
