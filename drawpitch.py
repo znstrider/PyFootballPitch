@@ -14,7 +14,10 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34],\
     Draws a pitch (default horizontal) on an axes object with width 105m and height 68m
     -----
     If you are using StatsBomb Data with a 120x80yard pitch, use:
-    measure = 'SBData'
+    measure = 'SB'
+    -----
+    If you are using Opta Data, use:
+    measure = 'Opta'
     -----
     If you are using any other pitch size, set measure to yards or metres
     for correct pitch markings and
@@ -24,29 +27,32 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34],\
     -----
     orientation: 'horizontal' or 'vertical'
     -----
-    Choose a Style with
+    Choose a Color Style with
     style_id = 1...8
     you can also set linecolor, lw (linewidth), and facecolor individually.
     -----
-    default arcs = True; False to not draw the penalty box arcs.
+    default arcs = True; set to False to not draw the penalty box arcs.
     -----
     use x_offset and y_offset to extend the plot further past the pitch
     or also to just draw half the pitch
     -----
-    grass_cutting = n to divide the pitch into n-1 vertical stripes from box to box
-    (works best for even n)
-    grass_cutting = True sets n to 14
+    set grass_cutting = True to draw vertical stripes on the pitch
     '''
 
 
-    if measure == 'metres':
-        measures = [3.66, 5.5, 9.12, 16.5, 40.24]
-    elif measure == 'yards':
+
+    if measure == 'yards':
         measures = [4, 6, 10, 18, 42]
-    elif (measure == 'SBData')|(measure == 'StatsBomb'):
+    elif (measure == 'SBData')|(measure == 'StatsBomb')|(measure == 'statsbomb')|(measure == 'SB'):
         measures = [4, 6, 10, 18, 42]
         hspan = [0, 120]
         vspan = [0, 80]
+    elif measure == 'Opta':
+        measures = [4.8, 5.8, 8.33, 17, 42.2]
+        hspan = [0, 100]
+        vspan = [0, 100]
+    else: #if measure is metres or whatever else use metres
+        measures = [3.66, 5.5, 9.12, 16.5, 40.24]
 
     hmid = (hspan[1]+hspan[0])/2
     vmid = (vspan[1]+vspan[0])/2
@@ -69,7 +75,7 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34],\
     ax.set_facecolor(facecolor)
 
 
-    if orientation == 'horizontal':
+    if (orientation == 'horizontal')|(orientation == 'h'):
         mid_circle = plt.Circle((hmid, vmid), radius=measures[2], fc='None', color = linecolor, lw = lw )
         ax.add_patch(mid_circle)
 
@@ -126,7 +132,7 @@ def drawpitch(ax, hspan = [-52.5, 52.5], vspan = [-34, 34],\
 
 
 
-    if orientation == 'vertical':
+    if (orientation == 'vertical')|(orientation == 'v'):
         ax.axis([vspan[0]-y_offset[0],vspan[1]+y_offset[1], hspan[0]-x_offset[0],hspan[1]+x_offset[1]])
 
         mid_circle = plt.Circle((vmid, hmid), radius=measures[2], fc='None', color = linecolor, lw = lw )
