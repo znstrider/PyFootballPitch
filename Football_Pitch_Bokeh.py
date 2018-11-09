@@ -4,58 +4,63 @@ from bokeh.models.glyphs import Circle, Patches, Wedge
 from bokeh.plotting import figure
 from bokeh.models import Range1d
 
-def draw_pitch(width = 700, height = 500, fill_color = '#B3DE69', fill_alpha = 0.5,
-               line_color = 'grey', line_alpha = 1,
-               arcs = True,
-               pitch_marks = None,
-               pitch_mark_alphas = np.array([0.25, 0.4])):
+def draw_pitch(width = 700, height = 500,
+                measure = 'metres',
+                fill_color = '#B3DE69', fill_alpha = 0.5,
+                line_color = 'grey', line_alpha = 1,
+                hspan = [-52.5, 52.5], vspan = [-34, 34],
+                arcs = True):
     '''
-
-    draws a customizable horizontal 105m x 68m Pitch
-
-    use pitch_marks = 'Grass Cutting' for differentiation of the pitch
-    into 5m segments along the x-axis.
-    pitch_marks = 'Positional Play' adds horizontal differentiations into
-    sides, channels (half-spaces) and the middle (at the inside of 6yard box edges).
-
+    -----
+    Draws and returns a pitch on a Bokeh figure object with width 105m and height 68m
+    p = drawpitch()
+    -----
+    If you are using StatsBomb Data with a 120x80yard pitch, use:
+    measure = 'SB'
+    -----
+    If you are using Opta Data, use:
+    measure = 'Opta'
+    -----
+    If you are using any other pitch size, set measure to yards or metres
+    for correct pitch markings and
+    hspan = [left, right] // eg. for SBData this is: hspan = [0, 120]
+    vspan = [bottom, top] //
+    to adjust the plot to your needs.
+    -----
     set arcs = False to not draw the penaltybox arcs
     '''
-    pitch_mark_alphas = np.array(pitch_mark_alphas)
-    p = figure(width = width, height = height, tools = 'save')
 
-    if (pitch_marks == 'Grass Cutting')|(pitch_marks =='Positional Play'):
-      v_marks = p.quad(top = 20*[34],
-           bottom = 20*[-34],
-           left =    [52.5, 52.5-5.5, 52.5-11, 52.5-16.5, 52.5-21.5, 52.5-26.5, 52.5-31.5, 52.5-36.5,
-                      52.5-41.5, 52.5-46.5, 0,
-                      -52.5+46.5, -52.5+41.5, -52.5+36.5, -52.5+31.5, -52.5+26.5,
-                      -52.5+21.5, -52.5+16.5, -52.5+11,-52.5+5.5],
-           right = [52.5-5.5, 52.5-11, 52.5-16.5, 52.5-21.5, 52.5-26.5, 52.5-31.5, 52.5-36.5,
-                      52.5-41.5, 52.5-46.5, 0,
-                      -52.5+46.5, -52.5+41.5, -52.5+36.5, -52.5+31.5, -52.5+26.5,
-                      -52.5+21.5, -52.5+16.5, -52.5+11,-52.5+5.5, -52.5],
-           color = fill_color,
-               alpha = pitch_mark_alphas[[0,1,0,1,0,1,0,1,0,1,1,0,1,0,1,0,1,0,1,0]],
-               line_width = 2,
-           line_alpha = 0,
-           line_color = line_color)
+    # measures:
+    # goalcenter to post, fiveyard-box-length, fiveyard-width,
+    # box-width, penalty-spot x-distance, circle-radius
 
-    if (pitch_marks =='Positional Play'):
-        h_marks = p.quad( top = [34, 20.12, 9.12, -20.12, -34],
-           bottom = [20.12, 9.12, -9.12, -9.12, -20.12],
-           left = [-52.5, -36, -36, -36, -52.5],
-           right = [52.5, 36, 36, 36, 52.5],
-           color = [fill_color,'white',fill_color,'white',fill_color],
-           alpha = [0.2,0.25,0.2,0.25,0.2],
-           line_width = 2,
-           line_alpha = 0.,
-           line_color = fill_color
-          )
 
-    boxes = p.quad(top = [34, 9.12, 20.12, 20.12, 9.12],
-           bottom = [-34, -9.12, -20.12, -20.12, -9.12],
-           left = [-52.5, 52.5-5.5, 52.5-16.5, -52.5+16.5, -52.5+5.5],
-           right = [52.5, 52.5, 52.5, -52.5, -52.5],
+    if measure == 'yards':
+        measures = [4, 6, 10, 18, 42, 12, 10]
+    elif (measure == 'SBData')|(measure == 'StatsBomb')|(measure == 'statsbomb')|(measure == 'SB'):
+        measures = [4, 6, 10, 18, 44, 12, 10]
+        hspan = [0, 120]
+        vspan = [0, 80]
+    elif measure == 'Opta':
+        measures = [4.8, 5.8, 13.2, 17, 57.8, 11.5, 8.71]
+        hspan = [0, 100]
+        vspan = [0, 100]
+    else: #if measure = metres or whatever else
+        measures = [3.66, 5.5, 9.16, 16.5, 40.32, 11, 9.15]
+
+    hmid = (hspan[1]+hspan[0])/2
+    vmid = (vspan[1]+vspan[0])/2
+
+    p = figure(width = width,
+        height = height,
+        x_range = Range1d(hspan[0], hspan[1]),
+        y_range = Range1d(vspan[0], vspan[1]),
+        tools = [])
+
+    boxes = p.quad(top = [vspan[1], vmid+measures[2], vmid+measures[4]/2, vmid+measures[4]/2, vmid+measures[2]],
+           bottom = [vspan[0], vmid-measures[2], vmid-measures[4]/2, vmid-measures[4]/2, vmid-measures[2]],
+           left = [hspan[0], hspan[1]-measures[1], hspan[1]-measures[3], hspan[0]+measures[3], hspan[0]+measures[1]],
+           right = [hspan[1], hspan[1], hspan[1], hspan[0], hspan[0]],
            color = fill_color,
            alpha = [fill_alpha,0,0,0,0], line_width = 2,
            line_alpha = line_alpha,
@@ -64,7 +69,7 @@ def draw_pitch(width = 700, height = 500, fill_color = '#B3DE69', fill_alpha = 0
     boxes.nonselection_glyph = boxes.glyph
 
     #middle circle
-    p.circle(x=[0], y=[0], radius = 9.12,
+    p.circle(x=[hmid], y=[vmid], radius = measures[6],
             color = line_color,
             line_width = 2,
             fill_alpha = 0,
@@ -72,20 +77,19 @@ def draw_pitch(width = 700, height = 500, fill_color = '#B3DE69', fill_alpha = 0
             line_color= line_color)
 
     if arcs == True:
-        p.arc(x=[-41.5, 41.5], y=[0, 0],
-            radius = 9.12,
-            start_angle = [(2*pi-np.arccos((16.5-11)/9.12)), pi - np.arccos((16.5-11)/9.12)],
-            end_angle = [np.arccos((16.5-11)/9.12), pi + np.arccos((16.5-11)/9.12)],
+        p.arc(x=[hspan[0]+measures[5], hspan[1]-measures[5]], y=[vmid, vmid],
+            radius = measures[6],
+            start_angle = [(2*pi-np.arccos((measures[3]-measures[5])/measures[6])), pi - np.arccos((measures[3]-measures[5])/measures[6])],
+            end_angle = [np.arccos((measures[3]-measures[5])/measures[6]), pi + np.arccos((measures[3]-measures[5])/measures[6])],
             color = line_color,
             line_width = 2)
-    p.circle([0, 52.5-11, -52.5+11], [0, 0, 0], size=5, color=line_color, alpha=1)
+
+    p.circle([hmid, hspan[1]-measures[5], hspan[0]+measures[5]], [vmid, vmid, vmid], size=5, color=line_color, alpha=1)
     #midfield line
-    p.line([0,0], [-34, 34], line_width = 2, color = line_color)
+    p.line([hmid, hmid], [vspan[0], vspan[1]], line_width = 2, color = line_color)
     #goal lines
-    p.line((52.5,52.5),(3.66,-3.66), line_width = 6, color = 'white')
-    p.line((-52.5,-52.5),(3.66,-3.66), line_width = 6, color = 'white')
-    p.x_range=Range1d(-52.5, 52.5)
-    p.y_range=Range1d(-34, 34)
+    p.line((hspan[1],hspan[1]),(vmid+measures[0],vmid-measures[0]), line_width = 6, color = 'white')
+    p.line((hspan[0],hspan[0]),(vmid+measures[0],vmid-measures[0]), line_width = 6, color = 'white')
     p.grid.visible = False
     p.xaxis.visible = False
     p.yaxis.visible = False
