@@ -41,10 +41,6 @@ create a figure and an axis object before invoking
     use x_offset and y_offset to extend the plot further past the pitch
     or also to just draw half the pitch
     -----
-    grass_cutting = n to divide the pitch into n-1 vertical stripes from box to box
-    (works best for even n)
-    grass_cutting = True sets n to 14
-    '''
 
 
 
@@ -55,18 +51,24 @@ for the bokeh function, invoke
 
     def draw_pitch(width = 700, height = 500, fill_color = '#B3DE69', fill_alpha = 0.5,
                line_color = 'grey', line_alpha = 1,
-               arcs = True,
-               pitch_marks = None,
-               pitch_mark_alphas = np.array([0.25, 0.4])):
+               arcs = True):
    
                
-    '''
-    draws a customizable horizontal 105m x 68m Pitch
-
-    use pitch_marks = 'Grass Cutting' for differentiation of the pitch
-    into 5m segments along the x-axis.
-    pitch_marks = 'Positional Play' adds horizontal differentiations into
-    sides, channels (half-spaces) and the middle (at the inside of 6yard box edges).
-
+    -----
+    Draws and returns a pitch on a Bokeh figure object with width 105m and height 68m
+    p = drawpitch()
+    -----
+    If you are using StatsBomb Data with a 120x80yard pitch, use:
+    measure = 'SB'
+    -----
+    If you are using Opta Data, use:
+    measure = 'Opta'
+    -----
+    If you are using any other pitch size, set measure to yards or metres
+    for correct pitch markings and
+    hspan = [left, right] // eg. for SBData this is: hspan = [0, 120]
+    vspan = [bottom, top] //
+    to adjust the plot to your needs.
+    -----
     set arcs = False to not draw the penaltybox arcs
     '''
